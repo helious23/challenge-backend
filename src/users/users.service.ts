@@ -1,25 +1,25 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "./entities/user.entity";
+import { Injectable } from '@nestjs/common';
+import { User } from './entities/user.entity';
 import {
   CreateAccountInput,
-  CreateAccountOutput
-} from "./dtos/create-account.dto";
+  CreateAccountOutput,
+} from './dtos/create-account.dto';
 import {
   ToggleSubscribeInput,
-  ToggleSubscribeOutput
-} from "./dtos/subscribe.dto";
-import { LoginInput, LoginOutput } from "./dtos/login.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { JwtService } from "../jwt/jwt.service";
-import { UserProfileOutput } from "./dtos/user-profile.dto";
-import { EditProfileInput, EditProfileOutput } from "./dtos/edit-profile.dto";
-import { Podcast } from "../podcast/entities/podcast.entity";
+  ToggleSubscribeOutput,
+} from './dtos/subscribe.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { JwtService } from '../jwt/jwt.service';
+import { UserProfileOutput } from './dtos/user-profile.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
+import { Podcast } from '../podcast/entities/podcast.entity';
 import {
   MarkEpisodeAsPlayedInput,
-  MarkEpisodeAsPlayedOutput
-} from "./dtos/mark-episode-played.dto";
-import { Episode } from "src/podcast/entities/episode.entity";
+  MarkEpisodeAsPlayedOutput,
+} from './dtos/mark-episode-played.dto';
+import { Episode } from 'src/podcast/entities/episode.entity';
 
 @Injectable()
 export class UsersService {
@@ -30,18 +30,18 @@ export class UsersService {
     private readonly podcasts: Repository<Podcast>,
     @InjectRepository(Episode)
     private readonly episodes: Repository<Episode>,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   private readonly InternalServerErrorOutput = {
     ok: false,
-    error: "Internal server error occurred."
+    error: 'Internal server error occurred.',
   };
 
   async createAccount({
     email,
     password,
-    role
+    role,
   }: CreateAccountInput): Promise<CreateAccountOutput> {
     try {
       const exists = await this.users.findOne({ email });
@@ -51,18 +51,19 @@ export class UsersService {
       const user = this.users.create({
         email,
         password,
-        role
+        role,
       });
       await this.users.save(user);
 
       return {
         ok: true,
-        error: null
+        error: null,
       };
-    } catch {
+    } catch (error) {
+      console.log(error);
       return {
         ok: false,
-        error: "Could not create account"
+        error: 'Could not create account',
       };
     }
   }
@@ -70,16 +71,16 @@ export class UsersService {
     try {
       const user = await this.users.findOne(
         { email },
-        { select: ["id", "password"] }
+        { select: ['id', 'password'] },
       );
       if (!user) {
-        return { ok: false, error: "User not found" };
+        return { ok: false, error: 'User not found' };
       }
       const passwordCorrect = await user.checkPassword(password);
       if (!passwordCorrect) {
         return {
           ok: false,
-          error: "Wrong password"
+          error: 'Wrong password',
         };
       }
 
@@ -87,12 +88,12 @@ export class UsersService {
 
       return {
         ok: true,
-        token
+        token,
       };
     } catch (error) {
       return {
         ok: false,
-        error
+        error,
       };
     }
   }
@@ -102,19 +103,19 @@ export class UsersService {
       const user = await this.users.findOneOrFail({ id });
       return {
         ok: true,
-        user
+        user,
       };
     } catch (error) {
       return {
         ok: false,
-        error: "User Not Found"
+        error: 'User Not Found',
       };
     }
   }
 
   async editProfile(
     userId: number,
-    { email, password }: EditProfileInput
+    { email, password }: EditProfileInput,
   ): Promise<EditProfileOutput> {
     try {
       const user = await this.users.findOneOrFail(userId);
@@ -124,31 +125,31 @@ export class UsersService {
 
       await this.users.save(user);
       return {
-        ok: true
+        ok: true,
       };
     } catch (error) {
       return {
         ok: false,
-        error: "Could not update profile"
+        error: 'Could not update profile',
       };
     }
   }
 
   async toggleSubscribe(
     user: User,
-    { podcastId }: ToggleSubscribeInput
+    { podcastId }: ToggleSubscribeInput,
   ): Promise<ToggleSubscribeOutput> {
     try {
       const podcast = await this.podcasts.findOne({ id: podcastId });
       if (!podcast) {
-        return { ok: false, error: "Podcast not found" };
+        return { ok: false, error: 'Podcast not found' };
       }
-      if (user.subsriptions.some((sub) => sub.id === podcast.id)) {
+      if (user.subsriptions.some(sub => sub.id === podcast.id)) {
         user.subsriptions = user.subsriptions.filter(
-          (sub) => sub.id !== podcast.id
+          sub => sub.id !== podcast.id,
         );
       } else {
-        console.log("foo");
+        console.log('foo');
         user.subsriptions = [...user.subsriptions, podcast];
       }
       await this.users.save(user);
@@ -160,12 +161,12 @@ export class UsersService {
 
   async markEpisodeAsPlayed(
     user: User,
-    { id: episodeId }: MarkEpisodeAsPlayedInput
+    { id: episodeId }: MarkEpisodeAsPlayedInput,
   ): Promise<MarkEpisodeAsPlayedOutput> {
     try {
       const episode = await this.episodes.findOne({ id: episodeId });
       if (!episode) {
-        return { ok: false, error: "Episode not found" };
+        return { ok: false, error: 'Episode not found' };
       }
       user.playedEpisodes = [...user.playedEpisodes, episode];
       await this.users.save(user);
