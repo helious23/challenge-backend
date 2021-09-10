@@ -47,6 +47,8 @@ import { PodcastsModule } from './podcast/podcasts.module';
     }),
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
+      introspection: true,
+      playground: true,
       autoSchemaFile: true,
       context: ({ req }) => {
         return { user: req['user'] };
