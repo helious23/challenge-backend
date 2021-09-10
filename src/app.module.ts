@@ -39,7 +39,7 @@ import { PodcastsModule } from './podcast/podcasts.module';
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
           }),
-      synchronize: true,
+      synchronize: process.env.NODE_ENV !== 'production',
       logging:
         process.env.NODE_ENV !== 'production' &&
         process.env.NODE_ENV !== 'test',
