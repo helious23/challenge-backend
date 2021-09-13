@@ -46,7 +46,7 @@ export class UsersService {
     try {
       const exists = await this.users.findOne({ email });
       if (exists) {
-        return { ok: false, error: `There is a user with that email already` };
+        return { ok: false, error: `사용중인 이메일 입니다` };
       }
       const user = this.users.create({
         email,
@@ -63,7 +63,7 @@ export class UsersService {
       console.log(error);
       return {
         ok: false,
-        error: 'Could not create account',
+        error: '회원 가입을 할 수 없습니다',
       };
     }
   }
@@ -80,7 +80,7 @@ export class UsersService {
       if (!passwordCorrect) {
         return {
           ok: false,
-          error: 'Wrong password',
+          error: '비밀번호가 맞지 않습니다',
         };
       }
 
@@ -108,7 +108,7 @@ export class UsersService {
     } catch (error) {
       return {
         ok: false,
-        error: 'User Not Found',
+        error: '가입하지 않은 이메일 입니다',
       };
     }
   }
@@ -130,7 +130,7 @@ export class UsersService {
     } catch (error) {
       return {
         ok: false,
-        error: 'Could not update profile',
+        error: '프로필을 업데이트 할 수 없습니다',
       };
     }
   }
