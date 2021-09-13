@@ -74,7 +74,7 @@ export class UsersService {
         { select: ['id', 'password'] },
       );
       if (!user) {
-        return { ok: false, error: 'User not found' };
+        return { ok: false, error: '사용자를 찾을 수 없습니다' };
       }
       const passwordCorrect = await user.checkPassword(password);
       if (!passwordCorrect) {
