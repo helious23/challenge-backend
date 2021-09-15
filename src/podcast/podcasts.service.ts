@@ -79,6 +79,7 @@ export class PodcastsService {
 
       const category = await this.categories.getOrCreate(
         createPodcastInput.categoryName,
+        createPodcastInput.categoryImg,
       );
 
       newPodcast.category = category;

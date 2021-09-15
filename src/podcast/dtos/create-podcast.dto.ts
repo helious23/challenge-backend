@@ -10,6 +10,9 @@ export class CreatePodcastInput extends PickType(
 ) {
   @Field(type => String)
   categoryName: string;
+
+  @Field(type => String, { nullable: true })
+  categoryImg?: string;
 }
 
 @ObjectType()

@@ -19,7 +19,12 @@ export class Category extends CoreEntity {
   @IsString()
   slug: string;
 
+  @Field(type => String)
+  @Column()
+  @IsString()
+  coverImg: string;
+
   @Field(type => [Podcast], { nullable: true })
   @OneToMany(type => Podcast, podcast => podcast.category)
-  podcasts: Podcast[];
+  podcasts?: Podcast[];
 }
