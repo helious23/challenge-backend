@@ -1,51 +1,59 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import {
   CreateEpisodeInput,
-  CreateEpisodeOutput
-} from "./dtos/create-episode.dto";
+  CreateEpisodeOutput,
+} from './dtos/create-episode.dto';
 import {
   CreatePodcastInput,
-  CreatePodcastOutput
-} from "./dtos/create-podcast.dto";
-import { UpdateEpisodeInput } from "./dtos/update-episode.dto";
-import { UpdatePodcastInput } from "./dtos/update-podcast.dto";
-import { Episode } from "./entities/episode.entity";
-import { Review } from "./entities/review.entity";
-import { Podcast } from "./entities/podcast.entity";
-import { CoreOutput } from "./dtos/output.dto";
+  CreatePodcastOutput,
+} from './dtos/create-podcast.dto';
+import { UpdateEpisodeInput } from './dtos/update-episode.dto';
+import { UpdatePodcastInput } from './dtos/update-podcast.dto';
+import { Episode } from './entities/episode.entity';
+import { Review } from './entities/review.entity';
+import { Podcast } from './entities/podcast.entity';
+import { CoreOutput } from './dtos/output.dto';
 import {
   PodcastOutput,
   EpisodesOutput,
   EpisodesSearchInput,
   GetAllPodcastsOutput,
-  GetEpisodeOutput
-} from "./dtos/podcast.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Raw, Like } from "typeorm";
+  GetEpisodeOutput,
+} from './dtos/podcast.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Raw, Like } from 'typeorm';
 import {
   SearchPodcastsInput,
-  SearchPodcastsOutput
-} from "./dtos/search-podcasts.dto";
+  SearchPodcastsOutput,
+} from './dtos/search-podcasts.dto';
 import {
   CreateReviewInput,
-  CreateReviewOutput
-} from "./dtos/create-review.dto";
-import { User } from "src/users/entities/user.entity";
+  CreateReviewOutput,
+} from './dtos/create-review.dto';
+import { User } from 'src/users/entities/user.entity';
+import { CategoryRepository } from './repositories/category.repository';
+import { Category } from './entities/category.entity';
+import { AllCategoriesOutput } from './dtos/all-categories.dto';
+import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { PodcastRepository } from './repositories/podcast.repository';
+import { MyPodcastsInput, MyPodcastsOutput } from './dtos/my-podcasts.dto';
+import { MyPodcastInput, MyPodcastOutput } from './dtos/my-podcast.dto';
+import { PodcastsInput, PodcastsOutput } from './dtos/podcasts.dto';
 
 @Injectable()
 export class PodcastsService {
   constructor(
-    @InjectRepository(Podcast)
-    private readonly podcastRepository: Repository<Podcast>,
+    private readonly podcastRepository: PodcastRepository,
     @InjectRepository(Episode)
     private readonly episodeRepository: Repository<Episode>,
     @InjectRepository(Review)
-    private readonly reviewRepository: Repository<Review>
+    private readonly reviewRepository: Repository<Review>,
+    private readonly categories: CategoryRepository,
   ) {}
 
   private readonly InternalServerErrorOutput = {
     ok: false,
-    error: "Internal server error occurred."
+    error: 'Internal server error occurred.',
   };
 
   async getAllPodcasts(): Promise<GetAllPodcastsOutput> {
@@ -53,7 +61,7 @@ export class PodcastsService {
       const podcasts = await this.podcastRepository.find();
       return {
         ok: true,
-        podcasts
+        podcasts,
       };
     } catch (e) {
       return this.InternalServerErrorOutput;
@@ -62,18 +70,91 @@ export class PodcastsService {
 
   async createPodcast(
     creator: User,
-    { title, category }: CreatePodcastInput
+    createPodcastInput: CreatePodcastInput,
   ): Promise<CreatePodcastOutput> {
     try {
-      const newPodcast = this.podcastRepository.create({ title, category });
+      const newPodcast = this.podcastRepository.create(createPodcastInput);
+
       newPodcast.creator = creator;
+
+      const category = await this.categories.getOrCreate(
+        createPodcastInput.categoryName,
+      );
+
+      newPodcast.category = category;
+
       const { id } = await this.podcastRepository.save(newPodcast);
       return {
         ok: true,
-        id
+        id,
       };
     } catch (e) {
       return this.InternalServerErrorOutput;
+    }
+  }
+
+  async myPodcasts(
+    creator: User,
+    { page }: MyPodcastsInput,
+  ): Promise<MyPodcastsOutput> {
+    try {
+      const [podcasts, totalResults] =
+        await this.podcastRepository.findAndCount({
+          where: { creator },
+          take: 9,
+          skip: (page - 1) * 9,
+        });
+
+      return {
+        ok: true,
+        totalResults,
+        totalPages: Math.ceil(totalResults / 9),
+        podcasts,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '팟캐스트를 찾을 수 없습니다',
+      };
+    }
+  }
+
+  async myPodcast(
+    creator: User,
+    { id }: MyPodcastInput,
+  ): Promise<MyPodcastOutput> {
+    try {
+      const podcast = await this.podcastRepository.findOne(
+        { creator, id },
+        { relations: ['episodes', 'reviews'] },
+      );
+      return {
+        ok: true,
+        podcast,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '팟캐스트를 찾을 수 없습니다',
+      };
+    }
+  }
+
+  async allPodcasts({ page }: PodcastsInput): Promise<PodcastsOutput> {
+    try {
+      const [results, totalResults] =
+        await this.podcastRepository.findWithPagination(page, 9);
+      return {
+        ok: true,
+        results,
+        totalPages: Math.ceil(totalResults / 9),
+        totalResults,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '팟캐스트를 불러오지 못했습니다',
+      };
     }
   }
 
@@ -81,17 +162,17 @@ export class PodcastsService {
     try {
       const podcast = await this.podcastRepository.findOne(
         { id },
-        { relations: ["episodes", "creator", "reviews"] }
+        { relations: ['episodes', 'creator', 'reviews'] },
       );
       if (!podcast) {
         return {
           ok: false,
-          error: `Podcast with id ${id} not found`
+          error: `Podcast with id ${id} not found`,
         };
       }
       return {
         ok: true,
-        podcast
+        podcast,
       };
     } catch (e) {
       return this.InternalServerErrorOutput;
@@ -105,7 +186,7 @@ export class PodcastsService {
         return { ok, error };
       }
       if (podcast.creator.id !== user.id) {
-        return { ok: false, error: "Not authorized" };
+        return { ok: false, error: 'Not authorized' };
       }
       await this.podcastRepository.delete({ id });
       return { ok };
@@ -116,7 +197,7 @@ export class PodcastsService {
 
   async updatePodcast(
     user: User,
-    { id, payload }: UpdatePodcastInput
+    { id, payload }: UpdatePodcastInput,
   ): Promise<CoreOutput> {
     try {
       const { ok, error, podcast } = await this.getPodcast(id);
@@ -124,7 +205,7 @@ export class PodcastsService {
         return { ok, error };
       }
       if (podcast.creator.id !== user.id) {
-        return { ok: false, error: "Not authorized" };
+        return { ok: false, error: 'Not authorized' };
       }
       if (
         payload.rating !== null &&
@@ -132,7 +213,7 @@ export class PodcastsService {
       ) {
         return {
           ok: false,
-          error: "Rating must be between 1 and 5."
+          error: 'Rating must be between 1 and 5.',
         };
       } else {
         const updatedPodcast: Podcast = { ...podcast, ...payload };
@@ -146,23 +227,24 @@ export class PodcastsService {
 
   async searchPodcasts({
     titleQuery,
-    page
+    page,
   }: SearchPodcastsInput): Promise<SearchPodcastsOutput> {
     try {
-      const [podcasts, totalCount] = await this.podcastRepository.findAndCount({
-        // where: { title: Raw((title) => `${title} LIKE ${titleQuery}`) },
-        where: { title: Like(`%${titleQuery}%`) },
-        take: 50,
-        skip: (page - 1) * 50
-      });
+      const [podcasts, totalResults] =
+        await this.podcastRepository.findAndCount({
+          // where: { title: Raw((title) => `${title} LIKE ${titleQuery}`) },
+          where: { title: Like(`%${titleQuery}%`) },
+          take: 50,
+          skip: (page - 1) * 50,
+        });
       if (!podcasts) {
-        return { ok: false, error: "Could not find podcasts" };
+        return { ok: false, error: '팟캐스트를 찾을 수 없습니다' };
       }
       return {
         ok: true,
         podcasts,
-        totalCount,
-        totalPages: Math.ceil(totalCount / 50)
+        totalResults,
+        totalPages: Math.ceil(totalResults / 50),
       };
     } catch (err) {
       console.log(err);
@@ -177,34 +259,34 @@ export class PodcastsService {
     }
     return {
       ok: true,
-      episodes: podcast.episodes
+      episodes: podcast.episodes,
     };
   }
 
   async getEpisode({
     podcastId,
-    episodeId
+    episodeId,
   }: EpisodesSearchInput): Promise<GetEpisodeOutput> {
     const { episodes, ok, error } = await this.getEpisodes(podcastId);
     if (!ok) {
       return { ok, error };
     }
-    const episode = episodes.find((episode) => episode.id === episodeId);
+    const episode = episodes.find(episode => episode.id === episodeId);
     if (!episode) {
       return {
         ok: false,
-        error: `Episode with id ${episodeId} not found in podcast with id ${podcastId}`
+        error: `Episode with id ${episodeId} not found in podcast with id ${podcastId}`,
       };
     }
     return {
       ok: true,
-      episode
+      episode,
     };
   }
 
   async createEpisode(
     user: User,
-    { podcastId, title, category }: CreateEpisodeInput
+    { podcastId, title, category }: CreateEpisodeInput,
   ): Promise<CreateEpisodeOutput> {
     try {
       const { podcast, ok, error } = await this.getPodcast(podcastId);
@@ -212,14 +294,17 @@ export class PodcastsService {
         return { ok, error };
       }
       if (podcast.creator.id !== user.id) {
-        return { ok: false, error: "Not authorized" };
+        return {
+          ok: false,
+          error: '자신이 만든 팟케스트의 에피소드만 생성할 수 있습니다',
+        };
       }
       const newEpisode = this.episodeRepository.create({ title, category });
       newEpisode.podcast = podcast;
       const { id } = await this.episodeRepository.save(newEpisode);
       return {
         ok: true,
-        id
+        id,
       };
     } catch (e) {
       return this.InternalServerErrorOutput;
@@ -228,18 +313,21 @@ export class PodcastsService {
 
   async deleteEpisode(
     user: User,
-    { podcastId, episodeId }: EpisodesSearchInput
+    { podcastId, episodeId }: EpisodesSearchInput,
   ): Promise<CoreOutput> {
     try {
       const { episode, error, ok } = await this.getEpisode({
         podcastId,
-        episodeId
+        episodeId,
       });
       if (!ok) {
         return { ok, error };
       }
       if (episode.podcast.creator.id !== user.id) {
-        return { ok: false, error: "Not authorized" };
+        return {
+          ok: false,
+          error: '자신이 만든 팟케스트의 에피소드만 삭제할 수 있습니다',
+        };
       }
       await this.episodeRepository.delete({ id: episode.id });
       return { ok: true };
@@ -250,18 +338,21 @@ export class PodcastsService {
 
   async updateEpisode(
     user: User,
-    { podcastId, episodeId, ...rest }: UpdateEpisodeInput
+    { podcastId, episodeId, ...rest }: UpdateEpisodeInput,
   ): Promise<CoreOutput> {
     try {
       const { episode, ok, error } = await this.getEpisode({
         podcastId,
-        episodeId
+        episodeId,
       });
       if (!ok) {
         return { ok, error };
       }
       if (episode.podcast.creator.id !== user.id) {
-        return { ok: false, error: "Not authorized" };
+        return {
+          ok: false,
+          error: '자신이 만든 팟케스트의 에피소드만 수정할 수 있습니다',
+        };
       }
       const updatedEpisode = { ...episode, ...rest };
       await this.episodeRepository.save(updatedEpisode);
@@ -273,12 +364,14 @@ export class PodcastsService {
 
   async createReview(
     creator: User,
-    { title, text, podcastId }: CreateReviewInput
+    { title, text, podcastId }: CreateReviewInput,
   ): Promise<CreateReviewOutput> {
     try {
-      const { ok, error: podcastFindErr, podcast } = await this.getPodcast(
-        podcastId
-      );
+      const {
+        ok,
+        error: podcastFindErr,
+        podcast,
+      } = await this.getPodcast(podcastId);
       if (!ok || podcastFindErr) {
         return { ok: false, error: podcastFindErr };
       }
@@ -289,6 +382,56 @@ export class PodcastsService {
       return { ok: true, id };
     } catch {
       return this.InternalServerErrorOutput;
+    }
+  }
+
+  countPodcasts(category: Category) {
+    return this.podcastRepository.count({ category });
+  }
+
+  async allCategories(): Promise<AllCategoriesOutput> {
+    try {
+      const categories = await this.categories.find();
+      return {
+        ok: true,
+        categories,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '카테고리를 볼 수 없습니다.',
+      };
+    }
+  }
+
+  async findCategoryBySlug({
+    slug,
+    page,
+  }: CategoryInput): Promise<CategoryOutput> {
+    try {
+      const category = await this.categories.findOne({ slug });
+      if (!category) {
+        return {
+          ok: false,
+          error: '카테고리를 찾을 수 없습니다',
+        };
+      }
+      const [podcasts, totalResults] =
+        await this.podcastRepository.findWithPagination(page, 9, category);
+      category.podcasts = podcasts;
+
+      return {
+        ok: true,
+        category,
+        podcasts,
+        totalResults,
+        totalPages: Math.ceil(totalResults / 9),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '카테고리를 불러오지 못했습니다',
+      };
     }
   }
 }

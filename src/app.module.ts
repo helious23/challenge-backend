@@ -17,6 +17,7 @@ import { Episode } from './podcast/entities/episode.entity';
 import { Review } from './podcast/entities/review.entity';
 import { PodcastsModule } from './podcast/podcasts.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
+import { Category } from './podcast/entities/category.entity';
 
 @Module({
   imports: [
@@ -49,7 +50,7 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
       logging:
         process.env.NODE_ENV !== 'production' &&
         process.env.NODE_ENV !== 'test',
-      entities: [Podcast, Episode, User, Review],
+      entities: [Podcast, Episode, User, Review, Category],
     }),
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
