@@ -20,6 +20,11 @@ import {
   MarkEpisodeAsPlayedOutput,
 } from './dtos/mark-episode-played.dto';
 import { Episode } from 'src/podcast/entities/episode.entity';
+import {
+  EditPasswordInput,
+  EditPasswordOutput,
+} from './dtos/edit-password.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -115,22 +120,63 @@ export class UsersService {
 
   async editProfile(
     userId: number,
-    { email, password }: EditProfileInput,
+    { email }: EditProfileInput,
   ): Promise<EditProfileOutput> {
     try {
-      const user = await this.users.findOneOrFail(userId);
-
-      if (email) user.email = email;
-      if (password) user.password = password;
-
+      const user = await this.users.findOne(userId);
+      if (email) {
+        if (user.email === email) {
+          return {
+            ok: false,
+            error: '동일한 이메일로는 변경할 수 없습니다',
+          };
+        }
+        const existUser = await this.users.findOne({
+          where: {
+            email,
+          },
+        });
+        if (existUser?.email === email) {
+          return {
+            ok: false,
+            error: '사용중인 이메일 입니다',
+          };
+        }
+        user.email = email;
+      }
       await this.users.save(user);
-      return {
-        ok: true,
-      };
+      return { ok: true };
     } catch (error) {
       return {
         ok: false,
-        error: '프로필을 업데이트 할 수 없습니다',
+        error: '프로필을 수정하지 못했습니다',
+      };
+    }
+  }
+
+  async editPassword(
+    userId: number,
+    { password: newPassword }: EditPasswordInput,
+  ): Promise<EditPasswordOutput> {
+    try {
+      const user = await this.users.findOne(userId);
+      const { password: oldPassword } = await this.users.findOne(userId, {
+        select: ['password'],
+      });
+      const samePassword = await bcrypt.compare(newPassword, oldPassword);
+      if (samePassword) {
+        return {
+          ok: false,
+          error: '동일한 비밀번호로는 변경할 수 없습니다',
+        };
+      }
+      user.password = newPassword;
+      await this.users.save(user);
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '패스워드를 수정하지 못했습니다',
       };
     }
   }

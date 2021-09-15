@@ -16,6 +16,10 @@ import {
 } from './dtos/subscribe.dto';
 import { Podcast } from 'src/podcast/entities/podcast.entity';
 import {
+  EditPasswordOutput,
+  EditPasswordInput,
+} from './dtos/edit-password.dto';
+import {
   MarkEpisodeAsPlayedOutput,
   MarkEpisodeAsPlayedInput,
 } from './dtos/mark-episode-played.dto';
@@ -57,6 +61,15 @@ export class UsersResolver {
     @Args('input') editProfileInput: EditProfileInput,
   ): Promise<EditProfileOutput> {
     return this.usersService.editProfile(authUser.id, editProfileInput);
+  }
+
+  @Mutation(returns => EditPasswordOutput)
+  @Role(['Any'])
+  editPassword(
+    @AuthUser() authUser: User,
+    @Args('input') editPasswordInput: EditPasswordInput,
+  ): Promise<EditPasswordOutput> {
+    return this.usersService.editPassword(authUser.id, editPasswordInput);
   }
 
   @Role(['Listener'])
