@@ -47,6 +47,7 @@ import { MyPodcastsOutput, MyPodcastsInput } from './dtos/my-podcasts.dto';
 import { MyPodcastOutput, MyPodcastInput } from './dtos/my-podcast.dto';
 import { PodcastsOutput, PodcastsInput } from './dtos/podcasts.dto';
 import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
+import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
 
 @Resolver(of => Podcast)
 export class PodcastsResolver {
@@ -100,6 +101,15 @@ export class PodcastsResolver {
     @Args('input') updatePodcastInput: UpdatePodcastInput,
   ): Promise<CoreOutput> {
     return this.podcastsService.updatePodcast(user, updatePodcastInput);
+  }
+
+  @Mutation(returns => CoreOutput)
+  @Role(['Host'])
+  podcastPromotion(
+    @AuthUser() user: User,
+    @Args('input') podcastPromotionInput: PodcastPromotionInput,
+  ): Promise<CoreOutput> {
+    return this.podcastsService.podcastPromotion(user, podcastPromotionInput);
   }
 
   @Query(returns => PodcastsOutput)

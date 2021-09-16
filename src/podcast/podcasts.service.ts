@@ -40,6 +40,7 @@ import { MyPodcastsInput, MyPodcastsOutput } from './dtos/my-podcasts.dto';
 import { MyPodcastInput, MyPodcastOutput } from './dtos/my-podcast.dto';
 import { PodcastsInput, PodcastsOutput } from './dtos/podcasts.dto';
 import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
+import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
 
 @Injectable()
 export class PodcastsService {
@@ -247,6 +248,31 @@ export class PodcastsService {
       }
     } catch (e) {
       return this.InternalServerErrorOutput;
+    }
+  }
+
+  async podcastPromotion(
+    host: User,
+    { id }: PodcastPromotionInput,
+  ): Promise<CoreOutput> {
+    try {
+      const podcast = await this.podcastRepository.findOne({ id });
+      if (!podcast) {
+        return {
+          ok: false,
+          error: '팟캐스트를 찾을 수 없습니다',
+        };
+      }
+      podcast.isPromoted = true;
+      await this.podcastRepository.save(podcast);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '프로모션을 진행할 수 없습니다',
+      };
     }
   }
 
