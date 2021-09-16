@@ -46,6 +46,7 @@ import { CategoryOutput, CategoryInput } from './dtos/category.dto';
 import { MyPodcastsOutput, MyPodcastsInput } from './dtos/my-podcasts.dto';
 import { MyPodcastOutput, MyPodcastInput } from './dtos/my-podcast.dto';
 import { PodcastsOutput, PodcastsInput } from './dtos/podcasts.dto';
+import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 
 @Resolver(of => Podcast)
 export class PodcastsResolver {
@@ -106,6 +107,11 @@ export class PodcastsResolver {
     @Args('input') podcastsInput: PodcastsInput,
   ): Promise<PodcastsOutput> {
     return this.podcastsService.allPodcasts(podcastsInput);
+  }
+
+  @Query(returns => PromotionPodcastsOutput)
+  promotionPocasts(): Promise<PodcastsOutput> {
+    return this.podcastsService.promotionPodcasts();
   }
 
   @Query(returns => PodcastOutput)

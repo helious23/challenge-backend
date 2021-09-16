@@ -1,6 +1,6 @@
 import { Episode } from './episode.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
-import { IsString, Min, Max, IsNumber } from 'class-validator';
+import { IsString, Min, Max, IsNumber, IsBoolean } from 'class-validator';
 import { Column, Entity, OneToMany, ManyToOne, RelationId } from 'typeorm';
 import { CoreEntity } from './core.entity';
 import { Review } from './review.entity';
@@ -60,4 +60,9 @@ export class Podcast extends CoreEntity {
   @Column({ nullable: true })
   @IsString()
   promotionImg?: string;
+
+  @Field(type => Boolean)
+  @Column({ default: false }) // 기존 레스토랑이 있으므로 default 를 false 로 설정해야 에러 X
+  @IsBoolean()
+  isPromoted: boolean;
 }
