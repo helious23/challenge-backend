@@ -74,16 +74,14 @@ export class PodcastsService {
   ): Promise<CreatePodcastOutput> {
     try {
       const newPodcast = this.podcastRepository.create(createPodcastInput);
-
+      newPodcast.promotionImg = createPodcastInput.promotionImage;
       newPodcast.creator = creator;
 
       const category = await this.categories.getOrCreate(
         createPodcastInput.categoryName,
         createPodcastInput.categoryImg,
       );
-
       newPodcast.category = category;
-
       const { id } = await this.podcastRepository.save(newPodcast);
       return {
         ok: true,
@@ -102,14 +100,14 @@ export class PodcastsService {
       const [podcasts, totalResults] =
         await this.podcastRepository.findAndCount({
           where: { creator },
-          take: 9,
-          skip: (page - 1) * 9,
+          take: 15,
+          skip: (page - 1) * 15,
         });
 
       return {
         ok: true,
         totalResults,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 15),
         podcasts,
       };
     } catch (error) {
@@ -144,11 +142,11 @@ export class PodcastsService {
   async allPodcasts({ page }: PodcastsInput): Promise<PodcastsOutput> {
     try {
       const [results, totalResults] =
-        await this.podcastRepository.findWithPagination(page, 9);
+        await this.podcastRepository.findWithPagination(page, 15);
       return {
         ok: true,
         results,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 15),
         totalResults,
       };
     } catch (error) {
@@ -418,7 +416,7 @@ export class PodcastsService {
         };
       }
       const [podcasts, totalResults] =
-        await this.podcastRepository.findWithPagination(page, 9, category);
+        await this.podcastRepository.findWithPagination(page, 15, category);
       category.podcasts = podcasts;
 
       return {
@@ -426,7 +424,7 @@ export class PodcastsService {
         category,
         podcasts,
         totalResults,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 15),
       };
     } catch (error) {
       return {

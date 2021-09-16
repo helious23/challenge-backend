@@ -15,6 +15,7 @@ import {
   ToggleSubscribeInput,
 } from './dtos/subscribe.dto';
 import { Podcast } from 'src/podcast/entities/podcast.entity';
+import { ToggleLikeOutput, ToggleLikeInput } from './dtos/like.dto';
 import {
   EditPasswordOutput,
   EditPasswordInput,
@@ -85,6 +86,21 @@ export class UsersResolver {
   @Query(() => [Podcast])
   subscriptions(@AuthUser() user: User): Podcast[] {
     return user.subsriptions;
+  }
+
+  @Role(['Listener'])
+  @Mutation(() => ToggleLikeOutput)
+  toggleLike(
+    @AuthUser() user: User,
+    @Args('input') toggleLikeInput: ToggleLikeInput,
+  ): Promise<ToggleLikeOutput> {
+    return this.usersService.toggleLike(user, toggleLikeInput);
+  }
+
+  @Role(['Listener'])
+  @Query(() => [Podcast])
+  likes(@AuthUser() user: User): Podcast[] {
+    return user.likes;
   }
 
   @Role(['Listener'])

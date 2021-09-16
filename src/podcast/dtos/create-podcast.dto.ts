@@ -5,7 +5,7 @@ import { CoreOutput } from './output.dto';
 @InputType()
 export class CreatePodcastInput extends PickType(
   Podcast,
-  ['title', 'coverImg'],
+  ['title', 'coverImg', 'description'],
   InputType,
 ) {
   @Field(type => String)
@@ -13,6 +13,9 @@ export class CreatePodcastInput extends PickType(
 
   @Field(type => String, { nullable: true })
   categoryImg?: string;
+
+  @Field(type => String, { nullable: true })
+  promotionImage?: string;
 }
 
 @ObjectType()

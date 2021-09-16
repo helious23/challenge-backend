@@ -52,7 +52,12 @@ export class Podcast extends CoreEntity {
   @Column({ nullable: true })
   description?: string;
 
+  @Field(type => String)
+  @Column()
+  coverImg: string;
+
   @Field(type => String, { nullable: true })
   @Column({ nullable: true })
-  coverImg?: string;
+  @IsString()
+  promotionImg?: string;
 }

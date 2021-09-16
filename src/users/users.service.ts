@@ -25,6 +25,7 @@ import {
   EditPasswordOutput,
 } from './dtos/edit-password.dto';
 import * as bcrypt from 'bcrypt';
+import { ToggleLikeInput, ToggleLikeOutput } from './dtos/like.dto';
 
 @Injectable()
 export class UsersService {
@@ -188,7 +189,7 @@ export class UsersService {
     try {
       const podcast = await this.podcasts.findOne({ id: podcastId });
       if (!podcast) {
-        return { ok: false, error: 'Podcast not found' };
+        return { ok: false, error: '팟캐스트를 찾을 수 없습니다' };
       }
       if (user.subsriptions.some(sub => sub.id === podcast.id)) {
         user.subsriptions = user.subsriptions.filter(
@@ -197,6 +198,28 @@ export class UsersService {
       } else {
         console.log('foo');
         user.subsriptions = [...user.subsriptions, podcast];
+      }
+      await this.users.save(user);
+      return { ok: true };
+    } catch {
+      return this.InternalServerErrorOutput;
+    }
+  }
+
+  async toggleLike(
+    user: User,
+    { podcastId }: ToggleLikeInput,
+  ): Promise<ToggleLikeOutput> {
+    try {
+      const podcast = await this.podcasts.findOne({ id: podcastId });
+      if (!podcast) {
+        return { ok: false, error: '팟캐스트를 찾을 수 없습니다' };
+      }
+      if (user.likes.some(like => like.id === podcast.id)) {
+        user.likes = user.likes.filter(sub => sub.id !== podcast.id);
+      } else {
+        console.log('foo');
+        user.likes = [...user.likes, podcast];
       }
       await this.users.save(user);
       return { ok: true };
