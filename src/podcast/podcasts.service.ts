@@ -285,8 +285,8 @@ export class PodcastsService {
         await this.podcastRepository.findAndCount({
           // where: { title: Raw((title) => `${title} LIKE ${titleQuery}`) },
           where: { title: Like(`%${titleQuery}%`) },
-          take: 50,
-          skip: (page - 1) * 50,
+          take: 9,
+          skip: (page - 1) * 9,
         });
       if (!podcasts) {
         return { ok: false, error: '팟캐스트를 찾을 수 없습니다' };
@@ -295,7 +295,7 @@ export class PodcastsService {
         ok: true,
         podcasts,
         totalResults,
-        totalPages: Math.ceil(totalResults / 50),
+        totalPages: Math.ceil(totalResults / 9),
       };
     } catch (err) {
       console.log(err);
