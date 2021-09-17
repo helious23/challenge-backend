@@ -42,6 +42,11 @@ import { PodcastsInput, PodcastsOutput } from './dtos/podcasts.dto';
 import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
 import { DeleteCategoryInput } from './dtos/delete-category.dto';
+import { CountLikesInput, CountLikesOutput } from './dtos/count-likes.dto';
+import {
+  CountSubscriptionsInput,
+  CountSubscriptionsOutput,
+} from './dtos/count-subscriptions.dto';
 
 @Injectable()
 export class PodcastsService {
@@ -415,7 +420,7 @@ export class PodcastsService {
   }
 
   async createReview(
-    creator: User,
+    reviewer: User,
     { title, text, podcastId }: CreateReviewInput,
   ): Promise<CreateReviewOutput> {
     try {
@@ -429,7 +434,7 @@ export class PodcastsService {
       }
       const review = this.reviewRepository.create({ title, text });
       review.podcast = podcast;
-      review.creator = creator;
+      review.reviewer = reviewer;
       const { id } = await this.reviewRepository.save(review);
       return { ok: true, id };
     } catch {
@@ -504,6 +509,58 @@ export class PodcastsService {
       return {
         ok: false,
         error: '카테고리를 지울 수 없습니다',
+      };
+    }
+  }
+
+  async countSubscriptions({
+    id,
+  }: CountSubscriptionsInput): Promise<CountSubscriptionsOutput> {
+    try {
+      const podcast = await this.podcastRepository.findOne(
+        { id },
+        { loadRelationIds: true },
+      );
+      if (!podcast) {
+        return {
+          ok: false,
+          error: '팟캐스트를 찾을 수 없습니다',
+        };
+      }
+      const users = podcast.subscriber.length;
+      return {
+        ok: true,
+        users,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '구독자를 찾을 수 없습니다',
+      };
+    }
+  }
+
+  async countLikes({ id }: CountLikesInput): Promise<CountLikesOutput> {
+    try {
+      const podcast = await this.podcastRepository.findOne(
+        { id },
+        { loadRelationIds: true },
+      );
+      if (!podcast) {
+        return {
+          ok: false,
+          error: '팟캐스트를 찾을 수 없습니다',
+        };
+      }
+      const users = podcast.liker.length;
+      return {
+        ok: true,
+        users,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '사용자를 찾을 수 없습니다',
       };
     }
   }

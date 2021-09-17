@@ -201,7 +201,8 @@ export class UsersService {
       }
       await this.users.save(user);
       return { ok: true };
-    } catch {
+    } catch (e) {
+      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }

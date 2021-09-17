@@ -49,6 +49,11 @@ import { PodcastsOutput, PodcastsInput } from './dtos/podcasts.dto';
 import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
 import { DeleteCategoryInput } from './dtos/delete-category.dto';
+import { CountLikesOutput, CountLikesInput } from './dtos/count-likes.dto';
+import {
+  CountSubscriptionsOutput,
+  CountSubscriptionsInput,
+} from './dtos/count-subscriptions.dto';
 
 @Resolver(of => Podcast)
 export class PodcastsResolver {
@@ -138,6 +143,22 @@ export class PodcastsResolver {
     @Args('input') searchPodcastsInput: SearchPodcastsInput,
   ): Promise<SearchPodcastsOutput> {
     return this.podcastsService.searchPodcasts(searchPodcastsInput);
+  }
+
+  @Role(['Listener'])
+  @Query(() => CountSubscriptionsOutput)
+  countSubscriptions(
+    @Args('input') countSubscriptionsInput: CountSubscriptionsInput,
+  ): Promise<CountSubscriptionsOutput> {
+    return this.podcastsService.countSubscriptions(countSubscriptionsInput);
+  }
+
+  @Role(['Listener'])
+  @Query(() => CountLikesOutput)
+  countLikes(
+    @Args('input') countLikesInput: CountLikesInput,
+  ): Promise<CountLikesOutput> {
+    return this.podcastsService.countLikes(countLikesInput);
   }
 }
 

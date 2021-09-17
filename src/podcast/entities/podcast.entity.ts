@@ -1,7 +1,15 @@
 import { Episode } from './episode.entity';
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { IsString, Min, Max, IsNumber, IsBoolean } from 'class-validator';
-import { Column, Entity, OneToMany, ManyToOne, RelationId } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  ManyToOne,
+  RelationId,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { CoreEntity } from './core.entity';
 import { Review } from './review.entity';
 import { User } from '../../users/entities/user.entity';
@@ -62,7 +70,17 @@ export class Podcast extends CoreEntity {
   promotionImg?: string;
 
   @Field(type => Boolean)
-  @Column({ default: false }) // 기존 레스토랑이 있으므로 default 를 false 로 설정해야 에러 X
+  @Column({ default: false })
   @IsBoolean()
   isPromoted: boolean;
+
+  @ManyToMany(() => User, user => user.subsriptions)
+  @Field(() => [User])
+  @JoinTable()
+  subscriber: User[];
+
+  @ManyToMany(() => User, user => user.likes)
+  @Field(() => [User])
+  @JoinTable()
+  liker: User[];
 }

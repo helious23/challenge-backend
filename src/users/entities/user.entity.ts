@@ -46,11 +46,11 @@ export class User extends CoreEntity {
   @Field(type => UserRole)
   role: UserRole;
 
-  @OneToMany(() => Podcast, podcast => podcast.creator, { eager: true })
+  @OneToMany(() => Podcast, podcast => podcast.creator)
   @Field(type => [Podcast])
   podcasts: Podcast[];
 
-  @OneToMany(() => Review, review => review.creator, { eager: true })
+  @OneToMany(() => Review, review => review.reviewer)
   @Field(type => [Review])
   reviews: Review[];
 
@@ -59,12 +59,12 @@ export class User extends CoreEntity {
   @JoinTable()
   playedEpisodes: Episode[];
 
-  @ManyToMany(() => Podcast, { eager: true })
+  @ManyToMany(() => Podcast, podcast => podcast.subscriber, { eager: true })
   @Field(() => [Podcast])
   @JoinTable()
   subsriptions: Podcast[];
 
-  @ManyToMany(() => Podcast, { eager: true })
+  @ManyToMany(() => Podcast, podcast => podcast.liker, { eager: true })
   @Field(() => [Podcast])
   @JoinTable()
   likes: Podcast[];
