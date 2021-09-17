@@ -343,7 +343,7 @@ export class PodcastsService {
 
   async createEpisode(
     user: User,
-    { podcastId, title, category }: CreateEpisodeInput,
+    { podcastId, title }: CreateEpisodeInput,
   ): Promise<CreateEpisodeOutput> {
     try {
       const { podcast, ok, error } = await this.getPodcast(podcastId);
@@ -356,7 +356,7 @@ export class PodcastsService {
           error: '자신이 만든 팟케스트의 에피소드만 생성할 수 있습니다',
         };
       }
-      const newEpisode = this.episodeRepository.create({ title, category });
+      const newEpisode = this.episodeRepository.create({ title });
       newEpisode.podcast = podcast;
       const { id } = await this.episodeRepository.save(newEpisode);
       return {
