@@ -1,5 +1,5 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
-import { IsString } from 'class-validator';
+import { IsString, IsNumber, Min, Max } from 'class-validator';
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { CoreEntity } from './core.entity';
 import { Podcast } from './podcast.entity';
@@ -23,4 +23,15 @@ export class Episode extends CoreEntity {
   @Field(type => String, { nullable: true })
   @Column({ nullable: true })
   description?: string;
+
+  @Field(type => String, { nullable: true })
+  @Column({ nullable: true })
+  episodeUrl?: string;
+
+  @Field(type => Number, { nullable: true, defaultValue: 0 })
+  @Column({ default: 0, nullable: true })
+  @IsNumber()
+  @Min(0)
+  @Max(5)
+  rating?: number;
 }

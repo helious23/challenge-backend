@@ -18,10 +18,9 @@ import {
   EpisodesOutput,
   EpisodesSearchInput,
   GetAllPodcastsOutput,
-  GetEpisodeOutput,
 } from './dtos/podcast.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Raw, Like } from 'typeorm';
+import { Repository, Raw, Like, ILike } from 'typeorm';
 import {
   SearchPodcastsInput,
   SearchPodcastsOutput,
@@ -43,6 +42,7 @@ import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
 import { DeleteCategoryInput } from './dtos/delete-category.dto';
 import { CountLikesInput, CountLikesOutput } from './dtos/count-likes.dto';
+import { GetEpisodeInput, GetEpisodeOutput } from './dtos/get-episode.dto';
 import {
   CountSubscriptionsInput,
   CountSubscriptionsOutput,
@@ -290,7 +290,7 @@ export class PodcastsService {
       const [podcasts, totalResults] =
         await this.podcastRepository.findAndCount({
           // where: { title: Raw((title) => `${title} LIKE ${titleQuery}`) },
-          where: { title: Like(`%${titleQuery}%`) },
+          where: { title: ILike(`%${titleQuery}%`) },
           take: 12,
           skip: (page - 1) * 12,
         });
@@ -323,7 +323,7 @@ export class PodcastsService {
   async getEpisode({
     podcastId,
     episodeId,
-  }: EpisodesSearchInput): Promise<GetEpisodeOutput> {
+  }: GetEpisodeInput): Promise<GetEpisodeOutput> {
     const { episodes, ok, error } = await this.getEpisodes(podcastId);
     if (!ok) {
       return { ok, error };

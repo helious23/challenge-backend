@@ -50,6 +50,7 @@ import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
 import { DeleteCategoryInput } from './dtos/delete-category.dto';
 import { CountLikesOutput, CountLikesInput } from './dtos/count-likes.dto';
+import { GetEpisodeInput, GetEpisodeOutput } from './dtos/get-episode.dto';
 import {
   CountSubscriptionsOutput,
   CountSubscriptionsInput,
@@ -171,6 +172,12 @@ export class EpisodeResolver {
     @Args('input') podcastSearchInput: PodcastSearchInput,
   ): Promise<EpisodesOutput> {
     return this.podcastService.getEpisodes(podcastSearchInput.id);
+  }
+
+  getEpisode(
+    @Args('input') getEpisodeInput: GetEpisodeInput,
+  ): Promise<GetEpisodeOutput> {
+    return this.podcastService.getEpisode(getEpisodeInput);
   }
 
   @Mutation(returns => CreateEpisodeOutput)

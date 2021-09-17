@@ -35,7 +35,3 @@ export class EpisodesSearchInput {
   @IsInt()
   episodeId: number;
 }
-
-export class GetEpisodeOutput extends CoreOutput {
-  episode?: Episode;
-}
