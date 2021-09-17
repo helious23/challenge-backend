@@ -102,14 +102,14 @@ export class PodcastsService {
       const [podcasts, totalResults] =
         await this.podcastRepository.findAndCount({
           where: { creator },
-          take: 15,
-          skip: (page - 1) * 15,
+          take: 9,
+          skip: (page - 1) * 9,
         });
 
       return {
         ok: true,
         totalResults,
-        totalPages: Math.ceil(totalResults / 15),
+        totalPages: Math.ceil(totalResults / 9),
         podcasts,
       };
     } catch (error) {
@@ -144,11 +144,11 @@ export class PodcastsService {
   async allPodcasts({ page }: PodcastsInput): Promise<PodcastsOutput> {
     try {
       const [results, totalResults] =
-        await this.podcastRepository.findWithPagination(page, 15);
+        await this.podcastRepository.findWithPagination(page, 9);
       return {
         ok: true,
         results,
-        totalPages: Math.ceil(totalResults / 15),
+        totalPages: Math.ceil(totalResults / 9),
         totalResults,
       };
     } catch (error) {
@@ -468,7 +468,7 @@ export class PodcastsService {
         };
       }
       const [podcasts, totalResults] =
-        await this.podcastRepository.findWithPagination(page, 15, category);
+        await this.podcastRepository.findWithPagination(page, 9, category);
       category.podcasts = podcasts;
 
       return {
@@ -476,7 +476,7 @@ export class PodcastsService {
         category,
         podcasts,
         totalResults,
-        totalPages: Math.ceil(totalResults / 15),
+        totalPages: Math.ceil(totalResults / 9),
       };
     } catch (error) {
       return {
