@@ -48,6 +48,7 @@ import { MyPodcastOutput, MyPodcastInput } from './dtos/my-podcast.dto';
 import { PodcastsOutput, PodcastsInput } from './dtos/podcasts.dto';
 import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
+import { DeleteCategoryInput } from './dtos/delete-category.dto';
 
 @Resolver(of => Podcast)
 export class PodcastsResolver {
@@ -212,5 +213,12 @@ export class CategoryResolver {
     @Args('input') categoryInput: CategoryInput,
   ): Promise<CategoryOutput> {
     return this.podcastService.findCategoryBySlug(categoryInput);
+  }
+
+  @Mutation(type => CoreOutput)
+  deleteCategory(
+    @Args('input') deleteCategoryInput: DeleteCategoryInput,
+  ): Promise<CoreOutput> {
+    return this.podcastService.deleteCategory(deleteCategoryInput);
   }
 }

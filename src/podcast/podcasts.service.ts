@@ -41,6 +41,7 @@ import { MyPodcastInput, MyPodcastOutput } from './dtos/my-podcast.dto';
 import { PodcastsInput, PodcastsOutput } from './dtos/podcasts.dto';
 import { PromotionPodcastsOutput } from './dtos/promotion-podcasts.dto';
 import { PodcastPromotionInput } from './dtos/podcast-promotion.dto';
+import { DeleteCategoryInput } from './dtos/delete-category.dto';
 
 @Injectable()
 export class PodcastsService {
@@ -482,6 +483,27 @@ export class PodcastsService {
       return {
         ok: false,
         error: '카테고리를 불러오지 못했습니다',
+      };
+    }
+  }
+
+  async deleteCategory({ id }: DeleteCategoryInput): Promise<CoreOutput> {
+    try {
+      const category = await this.categories.findOne({ id });
+      if (!category) {
+        return {
+          ok: false,
+          error: '카테고리를 찾을 수 없습니다',
+        };
+      }
+      await this.categories.delete({ id });
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '카테고리를 지울 수 없습니다',
       };
     }
   }
