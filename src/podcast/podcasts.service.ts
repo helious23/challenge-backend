@@ -103,14 +103,14 @@ export class PodcastsService {
       const [podcasts, totalResults] =
         await this.podcastRepository.findAndCount({
           where: { creator },
-          take: 9,
-          skip: (page - 1) * 9,
+          take: 12,
+          skip: (page - 1) * 12,
         });
 
       return {
         ok: true,
         totalResults,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 12),
         podcasts,
       };
     } catch (error) {
@@ -145,11 +145,11 @@ export class PodcastsService {
   async allPodcasts({ page }: PodcastsInput): Promise<PodcastsOutput> {
     try {
       const [results, totalResults] =
-        await this.podcastRepository.findWithPagination(page, 9);
+        await this.podcastRepository.findWithPagination(page, 12);
       return {
         ok: true,
         results,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 12),
         totalResults,
       };
     } catch (error) {
@@ -286,8 +286,8 @@ export class PodcastsService {
         await this.podcastRepository.findAndCount({
           // where: { title: Raw((title) => `${title} LIKE ${titleQuery}`) },
           where: { title: Like(`%${titleQuery}%`) },
-          take: 9,
-          skip: (page - 1) * 9,
+          take: 12,
+          skip: (page - 1) * 12,
         });
       if (!podcasts) {
         return { ok: false, error: '팟캐스트를 찾을 수 없습니다' };
@@ -296,7 +296,7 @@ export class PodcastsService {
         ok: true,
         podcasts,
         totalResults,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 12),
       };
     } catch (err) {
       console.log(err);
@@ -469,7 +469,7 @@ export class PodcastsService {
         };
       }
       const [podcasts, totalResults] =
-        await this.podcastRepository.findWithPagination(page, 9, category);
+        await this.podcastRepository.findWithPagination(page, 12, category);
       category.podcasts = podcasts;
 
       return {
@@ -477,7 +477,7 @@ export class PodcastsService {
         category,
         podcasts,
         totalResults,
-        totalPages: Math.ceil(totalResults / 9),
+        totalPages: Math.ceil(totalResults / 12),
       };
     } catch (error) {
       return {
