@@ -463,12 +463,12 @@ export class PodcastsService {
         loadRelationIds: true,
       });
 
-      // if (review.reviewer.id !== reviewer.id) {
-      //   return {
-      //     ok: false,
-      //     error: '자신이 작성한 댓글만 삭제할 수 있습니다',
-      //   };
-      // }
+      if (review.reviewer.id !== reviewer.id) {
+        return {
+          ok: false,
+          error: '자신이 작성한 댓글만 삭제할 수 있습니다',
+        };
+      }
 
       await this.reviewRepository.delete(episodeId);
 
