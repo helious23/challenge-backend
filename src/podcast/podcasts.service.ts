@@ -439,7 +439,7 @@ export class PodcastsService {
       const review = this.reviewRepository.create({ title, text });
       review.podcast = podcast;
       review.reviewer = reviewer;
-
+      console.log(review);
       const { id } = await this.reviewRepository.save(review);
       return { ok: true, id };
     } catch {

@@ -28,6 +28,7 @@ export class Review extends CoreEntity {
   @ManyToOne(() => User, user => user.reviews, {
     onDelete: 'CASCADE',
     nullable: true,
+    eager: true,
   })
   @Field(type => User, { nullable: true })
   reviewer?: User;
