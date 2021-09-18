@@ -52,6 +52,10 @@ import { DeleteCategoryInput } from './dtos/delete-category.dto';
 import { CountLikesOutput, CountLikesInput } from './dtos/count-likes.dto';
 import { GetEpisodeInput, GetEpisodeOutput } from './dtos/get-episode.dto';
 import {
+  DeleteReviewOutput,
+  DeleteReviewInput,
+} from './dtos/delete-review.dto';
+import {
   CountSubscriptionsOutput,
   CountSubscriptionsInput,
 } from './dtos/count-subscriptions.dto';
@@ -215,10 +219,19 @@ export class ReviewResolver {
   @Mutation(() => CreateReviewOutput)
   @Role(['Listener'])
   createReview(
-    @AuthUser() creator: User,
+    @AuthUser() reviewer: User,
     @Args('input') createReviewInput: CreateReviewInput,
   ): Promise<CreateReviewOutput> {
-    return this.podcastService.createReview(creator, createReviewInput);
+    return this.podcastService.createReview(reviewer, createReviewInput);
+  }
+
+  @Mutation(() => DeleteReviewOutput)
+  @Role(['Listener'])
+  deleteReview(
+    @AuthUser() reviewer: User,
+    @Args('input') deleteReviewInpt: DeleteReviewInput,
+  ): Promise<CreateReviewOutput> {
+    return this.podcastService.deleteReview(reviewer, deleteReviewInpt);
   }
 }
 

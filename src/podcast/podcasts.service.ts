@@ -44,6 +44,10 @@ import { DeleteCategoryInput } from './dtos/delete-category.dto';
 import { CountLikesInput, CountLikesOutput } from './dtos/count-likes.dto';
 import { GetEpisodeInput, GetEpisodeOutput } from './dtos/get-episode.dto';
 import {
+  DeleteReviewInput,
+  DeleteReviewOutput,
+} from './dtos/delete-review.dto';
+import {
   CountSubscriptionsInput,
   CountSubscriptionsOutput,
 } from './dtos/count-subscriptions.dto';
@@ -424,19 +428,51 @@ export class PodcastsService {
     { title, text, podcastId }: CreateReviewInput,
   ): Promise<CreateReviewOutput> {
     try {
-      const {
-        ok,
-        error: podcastFindErr,
-        podcast,
-      } = await this.getPodcast(podcastId);
-      if (!ok || podcastFindErr) {
-        return { ok: false, error: podcastFindErr };
+      const podcast = await this.podcastRepository.findOne(podcastId);
+      if (!podcast) {
+        return {
+          ok: false,
+          error: '팟캐스트를 찾을 수 없습니다',
+        };
       }
+
       const review = this.reviewRepository.create({ title, text });
       review.podcast = podcast;
       review.reviewer = reviewer;
+
       const { id } = await this.reviewRepository.save(review);
       return { ok: true, id };
+    } catch {
+      return this.InternalServerErrorOutput;
+    }
+  }
+
+  async deleteReview(
+    reviewer: User,
+    { id: episodeId, podcastId }: DeleteReviewInput,
+  ): Promise<DeleteReviewOutput> {
+    try {
+      const podcast = await this.podcastRepository.findOne(podcastId);
+      if (!podcast) {
+        return {
+          ok: false,
+          error: '팟캐스트를 찾을 수 없습니다',
+        };
+      }
+      const review = await this.reviewRepository.findOne(episodeId, {
+        loadRelationIds: true,
+      });
+
+      if (review.reviewer.id !== reviewer.id) {
+        return {
+          ok: false,
+          error: '자신이 작성한 댓글만 삭제할 수 있습니다',
+        };
+      }
+
+      await this.reviewRepository.delete(episodeId);
+
+      return { ok: true };
     } catch {
       return this.InternalServerErrorOutput;
     }

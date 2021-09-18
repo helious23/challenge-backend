@@ -50,7 +50,7 @@ export class User extends CoreEntity {
   @Field(type => [Podcast])
   podcasts: Podcast[];
 
-  @OneToMany(() => Review, review => review.reviewer)
+  @OneToMany(() => Review, review => review.reviewer, { eager: true })
   @Field(type => [Review])
   reviews: Review[];
 
