@@ -165,6 +165,11 @@ export class PodcastsResolver {
   ): Promise<CountLikesOutput> {
     return this.podcastsService.countLikes(countLikesInput);
   }
+
+  @ResolveField(type => Int)
+  subscriberCount(@Parent() podcast: Podcast): Promise<number> {
+    return this.podcastsService.countSubscriber(podcast);
+  }
 }
 
 @Resolver(of => Episode)
@@ -240,7 +245,7 @@ export class CategoryResolver {
   constructor(private readonly podcastService: PodcastsService) {}
 
   @ResolveField(type => Int)
-  categoryCount(@Parent() category: Category): Promise<number> {
+  podcastCount(@Parent() category: Category): Promise<number> {
     return this.podcastService.countPodcasts(category);
   }
 

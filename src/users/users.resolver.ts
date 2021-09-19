@@ -1,4 +1,12 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import {
+  Resolver,
+  Mutation,
+  Args,
+  Query,
+  ResolveField,
+  Int,
+  Parent,
+} from '@nestjs/graphql';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import {
@@ -85,7 +93,7 @@ export class UsersResolver {
   @Role(['Listener'])
   @Query(() => [Podcast])
   subscriptions(@AuthUser() user: User): Podcast[] {
-    return user.subsriptions;
+    return user.subscriptions;
   }
 
   @Role(['Listener'])

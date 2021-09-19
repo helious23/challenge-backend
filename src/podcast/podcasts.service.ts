@@ -61,6 +61,8 @@ export class PodcastsService {
     @InjectRepository(Review)
     private readonly reviewRepository: Repository<Review>,
     private readonly categories: CategoryRepository,
+    @InjectRepository(User)
+    private readonly users: Repository<User>,
   ) {}
 
   private readonly InternalServerErrorOutput = {
@@ -211,6 +213,7 @@ export class PodcastsService {
         podcast,
       };
     } catch (e) {
+      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
@@ -479,7 +482,11 @@ export class PodcastsService {
   }
 
   countPodcasts(category: Category) {
-    return this.podcastRepository.count({ category });
+    return this.podcastRepository.count({ category: category });
+  }
+
+  countSubscriber(podcast: Podcast) {
+    return this.users.count({ where: { subscriptions: podcast } });
   }
 
   async allCategories(): Promise<AllCategoriesOutput> {

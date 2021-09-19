@@ -191,13 +191,13 @@ export class UsersService {
       if (!podcast) {
         return { ok: false, error: '팟캐스트를 찾을 수 없습니다' };
       }
-      if (user.subsriptions.some(sub => sub.id === podcast.id)) {
-        user.subsriptions = user.subsriptions.filter(
+      if (user.subscriptions.some(sub => sub.id === podcast.id)) {
+        user.subscriptions = user.subscriptions.filter(
           sub => sub.id !== podcast.id,
         );
       } else {
         console.log('foo');
-        user.subsriptions = [...user.subsriptions, podcast];
+        user.subscriptions = [...user.subscriptions, podcast];
       }
       await this.users.save(user);
       return { ok: true };
