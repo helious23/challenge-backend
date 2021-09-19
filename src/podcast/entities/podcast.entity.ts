@@ -74,7 +74,7 @@ export class Podcast extends CoreEntity {
   @IsBoolean()
   isPromoted: boolean;
 
-  @ManyToMany(() => User, user => user.subscriptions, { eager: true })
+  @ManyToMany(() => User, user => user.subscriptions)
   @Field(() => [User])
   subscriber: User[];
 
