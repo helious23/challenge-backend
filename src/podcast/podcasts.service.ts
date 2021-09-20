@@ -468,7 +468,7 @@ export class PodcastsService {
 
       await this.reviewRepository.delete(reviewId);
 
-      return { ok: true, reviewId };
+      return { ok: true, id: reviewId };
     } catch {
       return this.InternalServerErrorOutput;
     }
