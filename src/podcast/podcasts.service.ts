@@ -451,7 +451,7 @@ export class PodcastsService {
   }
 
   async deleteReview(
-    reviewer: User,
+    user: User,
     { id: reviewId }: DeleteReviewInput,
   ): Promise<DeleteReviewOutput> {
     try {
@@ -459,7 +459,7 @@ export class PodcastsService {
         loadRelationIds: true,
       });
 
-      if (review.reviewer.id !== reviewer.id) {
+      if (review.reviewerId !== user.id) {
         return {
           ok: false,
           error: '자신이 작성한 댓글만 삭제할 수 있습니다',

@@ -1,6 +1,6 @@
 import { ObjectType, Field, InputType } from '@nestjs/graphql';
 import { IsString } from 'class-validator';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { CoreEntity } from './core.entity';
 import { Podcast } from './podcast.entity';
 import { User } from '../../users/entities/user.entity';
@@ -28,8 +28,10 @@ export class Review extends CoreEntity {
   @ManyToOne(() => User, user => user.reviews, {
     onDelete: 'CASCADE',
     nullable: true,
-    eager: true,
   })
   @Field(type => User, { nullable: true })
   reviewer?: User;
+
+  @RelationId((review: Review) => review.reviewer)
+  reviewerId: number;
 }

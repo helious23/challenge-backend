@@ -4,11 +4,7 @@ import { CoreOutput } from './output.dto';
 import { IsNumber } from 'class-validator';
 
 @InputType()
-export class DeleteReviewInput extends PickType(Review, ['id'], InputType) {
-  @Field(() => Number)
-  @IsNumber()
-  podcastId: number;
-}
+export class DeleteReviewInput extends PickType(Review, ['id'], InputType) {}
 
 @ObjectType()
 export class DeleteReviewOutput extends CoreOutput {}
