@@ -7,4 +7,7 @@ import { IsNumber } from 'class-validator';
 export class DeleteReviewInput extends PickType(Review, ['id'], InputType) {}
 
 @ObjectType()
-export class DeleteReviewOutput extends CoreOutput {}
+export class DeleteReviewOutput extends CoreOutput {
+  @Field(type => Int)
+  reviewId?: number;
+}
