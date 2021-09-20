@@ -452,17 +452,10 @@ export class PodcastsService {
 
   async deleteReview(
     reviewer: User,
-    { id: episodeId, podcastId }: DeleteReviewInput,
+    { id: reviewId }: DeleteReviewInput,
   ): Promise<DeleteReviewOutput> {
     try {
-      const podcast = await this.podcastRepository.findOne(podcastId);
-      if (!podcast) {
-        return {
-          ok: false,
-          error: '팟캐스트를 찾을 수 없습니다',
-        };
-      }
-      const review = await this.reviewRepository.findOne(episodeId, {
+      const review = await this.reviewRepository.findOne(reviewId, {
         loadRelationIds: true,
       });
 
@@ -473,7 +466,7 @@ export class PodcastsService {
         };
       }
 
-      await this.reviewRepository.delete(episodeId);
+      await this.reviewRepository.delete(reviewId);
 
       return { ok: true };
     } catch {
