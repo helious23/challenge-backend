@@ -191,7 +191,7 @@ export class PodcastsService {
     } catch (error) {
       return {
         ok: false,
-        error: '프로모션 팟',
+        error: '프로모션 중인 팟캐스트를 불러올 수 없습니다',
       };
     }
   }
@@ -264,10 +264,7 @@ export class PodcastsService {
     }
   }
 
-  async podcastPromotion(
-    host: User,
-    { id }: PodcastPromotionInput,
-  ): Promise<CoreOutput> {
+  async togglePromotion({ id }: PodcastPromotionInput): Promise<CoreOutput> {
     try {
       const podcast = await this.podcastRepository.findOne({ id });
       if (!podcast) {
@@ -276,7 +273,7 @@ export class PodcastsService {
           error: '팟캐스트를 찾을 수 없습니다',
         };
       }
-      podcast.isPromoted = true;
+      podcast.isPromoted = !podcast.isPromoted;
       await this.podcastRepository.save(podcast);
       return {
         ok: true,

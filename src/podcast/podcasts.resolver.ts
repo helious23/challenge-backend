@@ -116,11 +116,10 @@ export class PodcastsResolver {
 
   @Mutation(returns => CoreOutput)
   @Role(['Host'])
-  podcastPromotion(
-    @AuthUser() user: User,
+  togglePromotion(
     @Args('input') podcastPromotionInput: PodcastPromotionInput,
   ): Promise<CoreOutput> {
-    return this.podcastsService.podcastPromotion(user, podcastPromotionInput);
+    return this.podcastsService.togglePromotion(podcastPromotionInput);
   }
 
   @Query(returns => PodcastsOutput)
@@ -236,7 +235,7 @@ export class ReviewResolver {
   deleteReview(
     @AuthUser() reviewer: User,
     @Args('input') deleteReviewInpt: DeleteReviewInput,
-  ): Promise<CreateReviewOutput> {
+  ): Promise<DeleteReviewOutput> {
     return this.podcastService.deleteReview(reviewer, deleteReviewInpt);
   }
 }
