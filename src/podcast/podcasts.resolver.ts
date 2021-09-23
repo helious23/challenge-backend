@@ -119,7 +119,7 @@ export class PodcastsResolver {
   togglePromotion(
     @Args('input') podcastPromotionInput: PodcastPromotionInput,
   ): Promise<CoreOutput> {
-    return this.podcastsService.togglePromotion(podcastPromotionInput);
+    return this.podcastsService.podcastPromotion(podcastPromotionInput);
   }
 
   @Query(returns => PodcastsOutput)

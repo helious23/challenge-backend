@@ -26,6 +26,8 @@ import {
 } from './dtos/edit-password.dto';
 import * as bcrypt from 'bcrypt';
 import { ToggleLikeInput, ToggleLikeOutput } from './dtos/like.dto';
+import { MySubscriptionOutput } from './dtos/my-subscriptions.dto';
+import { MyLikesOutput } from './dtos/my-likes.dto';
 
 @Injectable()
 export class UsersService {
@@ -243,6 +245,50 @@ export class UsersService {
       return { ok: true };
     } catch {
       return this.InternalServerErrorOutput;
+    }
+  }
+
+  async mySubscriptions(client: User): Promise<MySubscriptionOutput> {
+    try {
+      const user = await this.users.findOne({
+        relations: ['subscriptions'],
+        where: {
+          id: client.id,
+        },
+      });
+      const podcasts = user.subscriptions;
+      return {
+        ok: true,
+        podcasts,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: '구독중인 팟캐스트를 불러올 수 없습니다',
+      };
+    }
+  }
+
+  async myLikes(client: User): Promise<MyLikesOutput> {
+    try {
+      const user = await this.users.findOne({
+        relations: ['likes'],
+        where: {
+          id: client.id,
+        },
+      });
+      const likes = user.likes;
+      return {
+        ok: true,
+        likes,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: '구독중인 팟캐스트를 불러올 수 없습니다',
+      };
     }
   }
 }

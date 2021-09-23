@@ -1,12 +1,4 @@
-import {
-  Resolver,
-  Mutation,
-  Args,
-  Query,
-  ResolveField,
-  Int,
-  Parent,
-} from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 import {
@@ -22,8 +14,10 @@ import {
   ToggleSubscribeOutput,
   ToggleSubscribeInput,
 } from './dtos/subscribe.dto';
-import { Podcast } from 'src/podcast/entities/podcast.entity';
 import { ToggleLikeOutput, ToggleLikeInput } from './dtos/like.dto';
+import { Podcast } from '../podcast/entities/podcast.entity';
+import { MySubscriptionOutput } from './dtos/my-subscriptions.dto';
+import { MyLikesOutput } from './dtos/my-likes.dto';
 import {
   EditPasswordOutput,
   EditPasswordInput,
@@ -91,9 +85,15 @@ export class UsersResolver {
   }
 
   @Role(['Listener'])
-  @Query(() => [Podcast])
-  subscriptions(@AuthUser() user: User): Podcast[] {
-    return user.subscriptions;
+  @Query(() => MySubscriptionOutput)
+  mySubscriptions(@AuthUser() user: User): Promise<MySubscriptionOutput> {
+    return this.usersService.mySubscriptions(user);
+  }
+
+  @Role(['Listener'])
+  @Query(() => MyLikesOutput)
+  myLikes(@AuthUser() user: User): Promise<MyLikesOutput> {
+    return this.usersService.myLikes(user);
   }
 
   @Role(['Listener'])

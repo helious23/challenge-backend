@@ -264,7 +264,7 @@ export class PodcastsService {
     }
   }
 
-  async togglePromotion({ id }: PodcastPromotionInput): Promise<CoreOutput> {
+  async podcastPromotion({ id }: PodcastPromotionInput): Promise<CoreOutput> {
     try {
       const podcast = await this.podcastRepository.findOne({ id });
       if (!podcast) {
@@ -273,7 +273,7 @@ export class PodcastsService {
           error: '팟캐스트를 찾을 수 없습니다',
         };
       }
-      podcast.isPromoted = !podcast.isPromoted;
+      podcast.isPromoted = true;
       await this.podcastRepository.save(podcast);
       return {
         ok: true,
