@@ -426,28 +426,41 @@ export class PodcastsService {
 
   async updateEpisode(
     user: User,
-    { podcastId, episodeId, ...rest }: UpdateEpisodeInput,
+    updateEpisodeInput: UpdateEpisodeInput,
   ): Promise<CoreOutput> {
     try {
-      const { episode, ok, error } = await this.getEpisode({
-        podcastId,
-        episodeId,
-      });
-      if (!ok) {
-        return { ok, error };
-      }
-      if (episode.podcast.creator.id !== user.id) {
+      const episode = await this.episodeRepository.findOne(
+        updateEpisodeInput.episodeId,
+        {
+          relations: ['podcast'],
+        },
+      );
+      if (!episode) {
         return {
           ok: false,
-          error: '자신이 만든 팟케스트의 에피소드만 수정할 수 있습니다',
+          error: '메뉴를 찾을 수 없습니다.',
         };
       }
-      const updatedEpisode = { ...episode, ...rest };
-      await this.episodeRepository.save(updatedEpisode);
-      return { ok: true };
-    } catch (e) {
-      console.log(e);
-      return this.InternalServerErrorOutput;
+      if (episode.podcast.creatorId !== user.id) {
+        return {
+          ok: false,
+          error: '자신이 등록한 식당의 메뉴만 수정할 수 있습니다',
+        };
+      }
+      await this.episodeRepository.save([
+        {
+          id: updateEpisodeInput.episodeId,
+          ...updateEpisodeInput,
+        },
+      ]);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '에피소드를 수정하지 못했습니다',
+      };
     }
   }
 
