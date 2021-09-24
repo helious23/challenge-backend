@@ -52,6 +52,10 @@ import { DeleteCategoryInput } from './dtos/delete-category.dto';
 import { CountLikesOutput, CountLikesInput } from './dtos/count-likes.dto';
 import { GetEpisodeInput, GetEpisodeOutput } from './dtos/get-episode.dto';
 import {
+  CreatePromotionImgOutput,
+  CreatePromotionImgInput,
+} from './dtos/create-promitionimg.dto';
+import {
   DeleteReviewOutput,
   DeleteReviewInput,
 } from './dtos/delete-review.dto';
@@ -76,6 +80,18 @@ export class PodcastsResolver {
     @Args('input') createPodcastInput: CreatePodcastInput,
   ): Promise<CreatePodcastOutput> {
     return this.podcastsService.createPodcast(user, createPodcastInput);
+  }
+
+  @Mutation(returns => CreatePromotionImgOutput)
+  @Role(['Host'])
+  createPromotionImg(
+    @AuthUser() user: User,
+    @Args('input') createPromotionImgInput: CreatePromotionImgInput,
+  ): Promise<CreatePromotionImgOutput> {
+    return this.podcastsService.createPromotionImg(
+      user,
+      createPromotionImgInput,
+    );
   }
 
   @Query(returns => MyPodcastsOutput)

@@ -44,6 +44,10 @@ import { DeleteCategoryInput } from './dtos/delete-category.dto';
 import { CountLikesInput, CountLikesOutput } from './dtos/count-likes.dto';
 import { GetEpisodeInput, GetEpisodeOutput } from './dtos/get-episode.dto';
 import {
+  CreatePromotionImgInput,
+  CreatePromotionImgOutput,
+} from './dtos/create-promitionimg.dto';
+import {
   DeleteReviewInput,
   DeleteReviewOutput,
 } from './dtos/delete-review.dto';
@@ -88,7 +92,6 @@ export class PodcastsService {
   ): Promise<CreatePodcastOutput> {
     try {
       const newPodcast = this.podcastRepository.create(createPodcastInput);
-      newPodcast.promotionImg = createPodcastInput.promotionImage;
       newPodcast.creator = creator;
 
       const category = await this.categories.getOrCreate(
@@ -103,6 +106,30 @@ export class PodcastsService {
       };
     } catch (e) {
       return this.InternalServerErrorOutput;
+    }
+  }
+
+  async createPromotionImg(
+    creator: User,
+    { id, promotionImage }: CreatePromotionImgInput,
+  ): Promise<CreatePromotionImgOutput> {
+    try {
+      const podcast = await this.podcastRepository.findOne({ id });
+      if (podcast.creator !== creator) {
+        return {
+          ok: false,
+          error: '자신이 등록한 팟캐스트에만 등록가능합니다',
+        };
+      }
+      podcast.promotionImg = promotionImage;
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: '프로모션 이미지를 만들수 없습니다',
+      };
     }
   }
 

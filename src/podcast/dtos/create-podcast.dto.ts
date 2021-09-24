@@ -13,9 +13,6 @@ export class CreatePodcastInput extends PickType(
 
   @Field(type => String, { nullable: true })
   categoryImg?: string;
-
-  @Field(type => String, { nullable: true })
-  promotionImage?: string;
 }
 
 @ObjectType()
