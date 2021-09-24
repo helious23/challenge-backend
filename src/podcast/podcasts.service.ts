@@ -263,31 +263,36 @@ export class PodcastsService {
 
   async updatePodcast(
     user: User,
-    { id, payload }: UpdatePodcastInput,
+    updatePodcastInput: UpdatePodcastInput,
   ): Promise<CoreOutput> {
     try {
-      const { ok, error, podcast } = await this.getPodcast(id);
-      if (!ok) {
-        return { ok, error };
-      }
-      if (podcast.creator.id !== user.id) {
-        return { ok: false, error: 'Not authorized' };
-      }
-      if (
-        payload.rating !== null &&
-        (payload.rating < 1 || payload.rating > 5)
-      ) {
+      const podcast = await this.podcastRepository.findOne(
+        updatePodcastInput.id,
+      );
+      if (!podcast) {
         return {
           ok: false,
-          error: 'Rating must be between 1 and 5.',
+          error: '팟캐스트를 찾을 수 없습니다',
         };
-      } else {
-        const updatedPodcast: Podcast = { ...podcast, ...payload };
-        await this.podcastRepository.save(updatedPodcast);
-        return { ok };
       }
+      if (podcast.creatorId !== user.id) {
+        return {
+          ok: false,
+          error: '자신이 등록한 팟캐스트만 수정할 수 있습니다',
+        };
+      }
+      await this.podcastRepository.save([
+        {
+          id: updatePodcastInput.id,
+          ...updatePodcastInput,
+        },
+      ]);
+      return { ok: true };
     } catch (e) {
-      return this.InternalServerErrorOutput;
+      return {
+        ok: false,
+        error: '팟캐스트를 수정할 수 없습니다',
+      };
     }
   }
 
