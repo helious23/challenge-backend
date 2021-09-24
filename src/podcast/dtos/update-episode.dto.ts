@@ -12,5 +12,10 @@ export class UpdateEpisodeInput extends EpisodesSearchInput {
   @Field(type => String, { nullable: true })
   @IsString()
   @IsOptional()
-  readonly category?: string;
+  readonly description?: string;
+
+  @Field(type => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  readonly episodeUrl?: string;
 }
