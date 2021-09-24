@@ -18,6 +18,7 @@ import { Review } from './podcast/entities/review.entity';
 import { PodcastsModule } from './podcast/podcasts.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { Category } from './podcast/entities/category.entity';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -67,6 +68,7 @@ import { Category } from './podcast/entities/category.entity';
     PodcastsModule,
     AuthModule,
     UsersModule,
+    UploadsModule,
   ],
   controllers: [],
   providers: [],
