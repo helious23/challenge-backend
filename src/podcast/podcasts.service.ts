@@ -374,28 +374,35 @@ export class PodcastsService {
 
   async createEpisode(
     user: User,
-    { podcastId, title }: CreateEpisodeInput,
+    createEpisodeInput: CreateEpisodeInput,
   ): Promise<CreateEpisodeOutput> {
     try {
-      const { podcast, ok, error } = await this.getPodcast(podcastId);
-      if (!ok) {
-        return { ok, error };
-      }
-      if (podcast.creator.id !== user.id) {
+      const podcast = await this.podcastRepository.findOne(
+        createEpisodeInput.podcastId,
+      );
+      if (!podcast) {
         return {
           ok: false,
-          error: '자신이 만든 팟케스트의 에피소드만 생성할 수 있습니다',
+          error: '팟캐스트를 찾지 못했습니다',
         };
       }
-      const newEpisode = this.episodeRepository.create({ title });
-      newEpisode.podcast = podcast;
-      const { id } = await this.episodeRepository.save(newEpisode);
+      if (user.id !== podcast.creatorId) {
+        return {
+          ok: false,
+          error: '자신이 등록한 팟캐스트의 에피소드만 만들수 있습니다',
+        };
+      }
+      await this.episodeRepository.save(
+        this.episodeRepository.create({ ...createEpisodeInput, podcast }),
+      );
       return {
         ok: true,
-        id,
       };
-    } catch (e) {
-      return this.InternalServerErrorOutput;
+    } catch (error) {
+      return {
+        ok: false,
+        error: '에피소드를 만들지 못했습니다',
+      };
     }
   }
 
