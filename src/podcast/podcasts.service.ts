@@ -392,11 +392,12 @@ export class PodcastsService {
           error: '자신이 등록한 팟캐스트의 에피소드만 만들수 있습니다',
         };
       }
-      await this.episodeRepository.save(
+      const { id } = await this.episodeRepository.save(
         this.episodeRepository.create({ ...createEpisodeInput, podcast }),
       );
       return {
         ok: true,
+        id,
       };
     } catch (error) {
       return {
