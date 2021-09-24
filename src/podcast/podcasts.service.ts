@@ -446,6 +446,7 @@ export class PodcastsService {
       await this.episodeRepository.save(updatedEpisode);
       return { ok: true };
     } catch (e) {
+      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
