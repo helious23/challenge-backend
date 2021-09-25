@@ -18,4 +18,9 @@ export class UpdatePodcastInput extends PickType(Podcast, ['id'], InputType) {
   @IsString()
   @IsOptional()
   coverImg?: string;
+
+  @Field(type => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  categoryName?: string;
 }
