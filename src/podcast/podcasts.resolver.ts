@@ -165,7 +165,7 @@ export class PodcastsResolver {
     return this.podcastsService.searchPodcasts(searchPodcastsInput);
   }
 
-  @Role(['Listener'])
+  @Role(['Any'])
   @Query(() => CountSubscriptionsOutput)
   countSubscriptions(
     @Args('input') countSubscriptionsInput: CountSubscriptionsInput,
@@ -173,7 +173,7 @@ export class PodcastsResolver {
     return this.podcastsService.countSubscriptions(countSubscriptionsInput);
   }
 
-  @Role(['Listener'])
+  @Role(['Any'])
   @Query(() => CountLikesOutput)
   countLikes(
     @Args('input') countLikesInput: CountLikesInput,
