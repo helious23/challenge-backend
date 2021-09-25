@@ -251,7 +251,7 @@ export class PodcastsService {
       if (!ok) {
         return { ok, error };
       }
-      if (podcast.creator.id !== user.id) {
+      if (podcast.creatorId !== user.id) {
         return { ok: false, error: 'Not authorized' };
       }
       await this.podcastRepository.delete({ id });
@@ -424,7 +424,7 @@ export class PodcastsService {
       if (!ok) {
         return { ok, error };
       }
-      if (episode.podcast.creator.id !== user.id) {
+      if (episode.podcast.creatorId !== user.id) {
         return {
           ok: false,
           error: '자신이 만든 팟케스트의 에피소드만 삭제할 수 있습니다',
