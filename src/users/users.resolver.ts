@@ -18,6 +18,7 @@ import { ToggleLikeOutput, ToggleLikeInput } from './dtos/like.dto';
 import { Podcast } from '../podcast/entities/podcast.entity';
 import { MySubscriptionOutput } from './dtos/my-subscriptions.dto';
 import { MyLikesOutput } from './dtos/my-likes.dto';
+import { ListenedEpisodeOutput } from './dtos/listened-episode.dto';
 import {
   EditPasswordOutput,
   EditPasswordInput,
@@ -106,12 +107,6 @@ export class UsersResolver {
   }
 
   @Role(['Listener'])
-  @Query(() => [Podcast])
-  likes(@AuthUser() user: User): Podcast[] {
-    return user.likes;
-  }
-
-  @Role(['Listener'])
   @Mutation(() => MarkEpisodeAsPlayedOutput)
   markEpisodeAsPlayed(
     @AuthUser() user: User,
@@ -121,5 +116,11 @@ export class UsersResolver {
       user,
       markEpisodeAsPlayedInput,
     );
+  }
+
+  @Role(['Listener'])
+  @Query(() => ListenedEpisodeOutput)
+  listenedEpisode(@AuthUser() user: User): Promise<ListenedEpisodeOutput> {
+    return this.usersService.listenedEpisode(user);
   }
 }

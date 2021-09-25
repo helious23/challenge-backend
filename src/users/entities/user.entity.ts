@@ -54,7 +54,7 @@ export class User extends CoreEntity {
   @Field(type => [Review])
   reviews: Review[];
 
-  @ManyToMany(() => Episode)
+  @ManyToMany(() => Episode, { eager: true })
   @Field(type => [Episode])
   @JoinTable()
   playedEpisodes: Episode[];
