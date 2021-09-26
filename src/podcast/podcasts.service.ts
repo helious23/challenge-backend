@@ -247,16 +247,23 @@ export class PodcastsService {
 
   async deletePodcast(user: User, id: number): Promise<CoreOutput> {
     try {
-      const { ok, error, podcast } = await this.getPodcast(id);
-      if (!ok) {
-        return { ok, error };
+      const podcast = await this.podcastRepository.findOne(id);
+      if (!podcast) {
+        return {
+          ok: false,
+          error: '팟캐스트를 찾을 수 없습니다',
+        };
       }
+
       if (podcast.creatorId !== user.id) {
         return { ok: false, error: 'Not authorized' };
       }
       await this.podcastRepository.delete({ id });
-      return { ok };
+      return {
+        ok: true,
+      };
     } catch (e) {
+      console.log(e);
       return this.InternalServerErrorOutput;
     }
   }
