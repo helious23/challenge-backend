@@ -56,31 +56,30 @@ export class User extends CoreEntity {
 
   @ManyToMany(() => Episode, {
     eager: true,
-    onDelete: 'SET NULL',
-    nullable: true,
+    onDelete: 'CASCADE',
+    cascade: true,
   })
-  @Field(type => [Episode], { nullable: true })
+  @Field(type => [Episode])
   @JoinTable()
-  playedEpisodes?: Episode[];
+  playedEpisodes: Episode[];
 
   @ManyToMany(() => Podcast, podcast => podcast.subscriber, {
     eager: true,
     onDelete: 'CASCADE',
     cascade: true,
-    nullable: true,
   })
-  @Field(() => [Podcast], { nullable: true })
+  @Field(() => [Podcast])
   @JoinTable()
-  subscriptions?: Podcast[];
+  subscriptions: Podcast[];
 
   @ManyToMany(() => Podcast, podcast => podcast.liker, {
     eager: true,
-    onDelete: 'SET NULL',
-    nullable: true,
+    onDelete: 'CASCADE',
+    cascade: true,
   })
-  @Field(() => [Podcast], { nullable: true })
+  @Field(() => [Podcast])
   @JoinTable()
-  likes?: Podcast[];
+  likes: Podcast[];
 
   @BeforeInsert()
   @BeforeUpdate()
