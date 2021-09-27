@@ -55,6 +55,7 @@ import {
   CountSubscriptionsInput,
   CountSubscriptionsOutput,
 } from './dtos/count-subscriptions.dto';
+import { getConnection } from 'typeorm';
 
 @Injectable()
 export class PodcastsService {
@@ -245,9 +246,30 @@ export class PodcastsService {
     }
   }
 
-  async deletePodcast(user: User, id: number): Promise<CoreOutput> {
+  async deletePodcast(cretor: User, id: number): Promise<CoreOutput> {
     try {
-      const podcast = await this.podcastRepository.findOne(id);
+      const podcast = await this.podcastRepository.findOne(id, {
+        relations: ['subscriber', 'liker'],
+      });
+
+      podcast.subscriber.map(async user => {
+        user.subscriptions = user.subscriptions.filter(
+          subPod => subPod.id !== podcast.id,
+        );
+        user.likes = user.likes.filter(likePod => likePod.id !== podcast.id);
+        user.playedEpisodes = user.playedEpisodes.filter(
+          episode => episode.podcast.id !== podcast.id,
+        );
+        await this.users.save([
+          {
+            id: user.id,
+          },
+        ]);
+        return null;
+      });
+
+      await this.podcastRepository.save(podcast);
+
       if (!podcast) {
         return {
           ok: false,
@@ -255,10 +277,11 @@ export class PodcastsService {
         };
       }
 
-      if (podcast.creatorId !== user.id) {
+      if (podcast.creatorId !== cretor.id) {
         return { ok: false, error: 'Not authorized' };
       }
-      await this.podcastRepository.delete({ id });
+
+      await this.podcastRepository.remove(podcast);
       return {
         ok: true,
       };
