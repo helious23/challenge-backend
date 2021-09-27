@@ -124,6 +124,7 @@ export class PodcastsService {
       }
       podcast.promotionImg = promotionImage;
       podcast.isPromoted = true;
+      await this.podcastRepository.save(podcast);
       return {
         ok: true,
       };
