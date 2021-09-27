@@ -116,7 +116,7 @@ export class PodcastsService {
   ): Promise<CreatePromotionImgOutput> {
     try {
       const podcast = await this.podcastRepository.findOne({ id });
-      if (podcast.creator !== creator) {
+      if (podcast.creatorId !== creator.id) {
         return {
           ok: false,
           error: '자신이 등록한 팟캐스트에만 등록가능합니다',
