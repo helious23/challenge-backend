@@ -169,7 +169,7 @@ export class PodcastsService {
     try {
       const podcast = await this.podcastRepository.findOne(
         { creator, id },
-        { relations: ['episodes', 'reviews'] },
+        { relations: ['episodes', 'reviews', 'subscriber'] },
       );
       return {
         ok: true,
