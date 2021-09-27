@@ -123,6 +123,7 @@ export class PodcastsService {
         };
       }
       podcast.promotionImg = promotionImage;
+      podcast.isPromoted = true;
       return {
         ok: true,
       };
@@ -267,8 +268,6 @@ export class PodcastsService {
         return null;
       });
       await this.podcastRepository.save(podcast);
-
-      console.log(podcast);
 
       if (!podcast) {
         return {
