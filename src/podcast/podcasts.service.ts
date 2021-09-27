@@ -256,19 +256,19 @@ export class PodcastsService {
         user.subscriptions = user.subscriptions.filter(
           subPod => subPod.id !== podcast.id,
         );
-        user.likes = user.likes.filter(likePod => likePod.id !== podcast.id);
-        user.playedEpisodes = user.playedEpisodes.filter(
-          episode => episode.podcast.id !== podcast.id,
-        );
-        await this.users.save([
-          {
-            id: user.id,
-          },
-        ]);
+        await this.users.save(user);
         return null;
       });
-
       await this.podcastRepository.save(podcast);
+
+      podcast.liker.map(async user => {
+        user.likes = user.likes.filter(likePod => likePod.id !== podcast.id);
+        await this.users.save(user);
+        return null;
+      });
+      await this.podcastRepository.save(podcast);
+
+      console.log(podcast);
 
       if (!podcast) {
         return {

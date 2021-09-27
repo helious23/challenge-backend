@@ -21,9 +21,10 @@ export class Review extends CoreEntity {
 
   @ManyToOne(() => Podcast, podcast => podcast.reviews, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
-  @Field(type => Podcast)
-  podcast: Podcast;
+  @Field(type => Podcast, { nullable: true })
+  podcast?: Podcast;
 
   @ManyToOne(() => User, user => user.reviews, {
     onDelete: 'CASCADE',
