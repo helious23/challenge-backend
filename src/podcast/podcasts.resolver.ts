@@ -182,6 +182,7 @@ export class PodcastsResolver {
   }
 
   @ResolveField(type => Int)
+  @Query(returns => Int)
   subscriberCount(@Parent() podcast: Podcast): Promise<number> {
     return this.podcastsService.countSubscriber(podcast);
   }

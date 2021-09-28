@@ -29,6 +29,7 @@ import { ToggleLikeInput, ToggleLikeOutput } from './dtos/like.dto';
 import { MySubscriptionOutput } from './dtos/my-subscriptions.dto';
 import { MyLikesOutput } from './dtos/my-likes.dto';
 import { ListenedEpisodeOutput } from './dtos/listened-episode.dto';
+import { MyFeedsOutput } from './dtos/my-feeds.dto';
 
 @Injectable()
 export class UsersService {
@@ -311,6 +312,28 @@ export class UsersService {
       return {
         ok: false,
         error: '청취한 에피소드를 불러올 수 없습니다',
+      };
+    }
+  }
+
+  async myFeeds(client: User): Promise<MyFeedsOutput> {
+    try {
+      const user = await this.users.findOne({
+        relations: ['subscriptions', 'subscriptions.episodes'],
+        where: {
+          id: client.id,
+        },
+      });
+      const podcasts = user.subscriptions;
+      return {
+        ok: true,
+        podcasts,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: '구독중인 팟캐스트를 불러올 수 없습니다',
       };
     }
   }

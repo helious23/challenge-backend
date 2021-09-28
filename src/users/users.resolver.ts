@@ -19,6 +19,7 @@ import { Podcast } from '../podcast/entities/podcast.entity';
 import { MySubscriptionOutput } from './dtos/my-subscriptions.dto';
 import { MyLikesOutput } from './dtos/my-likes.dto';
 import { ListenedEpisodeOutput } from './dtos/listened-episode.dto';
+import { MyFeedsOutput } from './dtos/my-feeds.dto';
 import {
   EditPasswordOutput,
   EditPasswordInput,
@@ -122,5 +123,11 @@ export class UsersResolver {
   @Query(() => ListenedEpisodeOutput)
   listenedEpisode(@AuthUser() user: User): Promise<ListenedEpisodeOutput> {
     return this.usersService.listenedEpisode(user);
+  }
+
+  @Role(['Listener'])
+  @Query(() => MyFeedsOutput)
+  myFeeds(@AuthUser() user: User): Promise<MyFeedsOutput> {
+    return this.usersService.myFeeds(user);
   }
 }
