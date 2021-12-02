@@ -27,16 +27,16 @@ export class UploadsController {
       }`;
       await new AWS.S3()
         // .config.update({region:'ap-northeast-2'})
-        // .createBucket({
-        //   Bucket: BUCKET_NAME,
-        // })
-        // 버킷 생성 시 한번만 실행
-        .putObject({
-          Body: file.buffer,
+        .createBucket({
           Bucket: BUCKET_NAME,
-          Key: objectName,
-          ACL: 'public-read',
         })
+        // 버킷 생성 시 한번만 실행
+        // .putObject({
+        //   Body: file.buffer,
+        //   Bucket: BUCKET_NAME,
+        //   Key: objectName,
+        //   ACL: 'public-read',
+        // })
         .promise();
       const url = `https://${BUCKET_NAME}.s3.amazonaws.com/${objectName}`;
       return { url };
